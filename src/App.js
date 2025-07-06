@@ -31,9 +31,9 @@ const App = () => {
     setStep(3);
   };
 
-  const handleSurveyComplete = (scenariosData) => {
-    setFormData({ ...formData, scenariosData });
-    setStep(4);
+  const handleSurveyComplete = () => {
+    console.log("Survey part completed. Moving to FeedbackForm (Step 4).");
+    setStep(4); // Advance to the FeedbackForm
   };
 
   const handleFeedbackSubmit = (feedback) => {
@@ -49,7 +49,7 @@ const App = () => {
       {step === 3 && (
         <Survey
           onComplete={handleSurveyComplete}
-          promptingChoice={handlePromptingChoice}
+
         />
       )}
       {step === 4 && <FeedbackForm onSubmit={handleFeedbackSubmit} />}
