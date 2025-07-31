@@ -43,6 +43,7 @@ const App = () => {
 
   return (
     <div className="form-container">
+      
       {step === 0 && <ConsentForm onConsent={handleConsent} />}
       {step === 1 && <DemographicsForm onSubmit={handleDemographicsSubmit} />}
       {step === 2 && <Instructions onNext={() => setStep(3)} />}
