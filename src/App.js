@@ -26,10 +26,10 @@ const App = () => {
     setStep(2);
   };
 
-  const handlePromptingChoice = (choice) => {
-    setFormData({ ...formData, preferredPrompting: choice });
-    setStep(3);
-  };
+  // const handlePromptingChoice = (choice) => {
+  //   setFormData({ ...formData, preferredPrompting: choice });
+  //   setStep(3);
+  // };
 
   const handleSurveyComplete = () => {
     console.log("Survey part completed. Moving to FeedbackForm (Step 4).");

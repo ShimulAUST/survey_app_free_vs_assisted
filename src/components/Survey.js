@@ -5,10 +5,10 @@ import axios from "axios";
 const Survey = ({ onComplete }) => {
     const scenarios = [
         { title: "Scenario 1:", paragraph: "You need to create a marketing strategy for a new tech product targeted at university students. Consider the product's key features and define the target market. Think about advertising channels like social media, campus events, and digital ads. Focus on budget allocation and how you would measure campaign success." },
-        { title: "Scenario 2:", paragraph: "You need to invent a product that addresses a common problem people face in daily life. Describe the problem, the target audience, and the features of the product. Explain how it’s different from existing solutions and how it will be marketed and distributed." },
-        { title: "Scenario 3:", paragraph: "Write a persuasive essay on a social issue such as universal basic income (UBI). Present a clear argument, backed by reasoning and evidence, and discuss both the pros and cons." },
-        { title: "Scenario 4:", paragraph: "Design a fitness plan for someone with limited access to gym equipment, focusing on bodyweight exercises or resistance bands. The plan should include strength training, cardio, and flexibility." },
-        { title: "Scenario 5:", paragraph: "Design an online course curriculum for 'Introduction to Data Science,' covering topics like data analysis, statistics, and machine learning." },
+        // { title: "Scenario 2:", paragraph: "You need to invent a product that addresses a common problem people face in daily life. Describe the problem, the target audience, and the features of the product. Explain how it’s different from existing solutions and how it will be marketed and distributed." },
+        // { title: "Scenario 3:", paragraph: "Write a persuasive essay on a social issue such as universal basic income (UBI). Present a clear argument, backed by reasoning and evidence, and discuss both the pros and cons." },
+        // { title: "Scenario 4:", paragraph: "Design a fitness plan for someone with limited access to gym equipment, focusing on bodyweight exercises or resistance bands. The plan should include strength training, cardio, and flexibility." },
+        // { title: "Scenario 5:", paragraph: "Design an online course curriculum for 'Introduction to Data Science,' covering topics like data analysis, statistics, and machine learning." },
     ];
 
     // State to manage the survey flow and data
@@ -35,7 +35,7 @@ const Survey = ({ onComplete }) => {
 
     // Shuffles the scenarios array randomly
     const shuffleScenarios = () => {
-        const shuffled = [...scenarios].sort(() => Math.random() - 0.5);
+        const shuffled = [...scenarios].sort(() => Math.random() - 0.1);
         setRandomizedScenarios(shuffled);
     };
 
@@ -54,7 +54,7 @@ const Survey = ({ onComplete }) => {
 
     // Initializes prompting type and shuffles scenarios on component mount
     useEffect(() => {
-        const startingType = Math.random() > 0.5 ? "Free" : "Assisted";
+        const startingType = Math.random() > 0.1 ? "Free" : "Assisted";
         setPromptingType(startingType);
         shuffleScenarios();
     }, []);
