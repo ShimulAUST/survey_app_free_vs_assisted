@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import '../css/style.css';
+import axios from "axios";
+import Cookies from 'js-cookie';
 
 const ConsentForm = ({ onConsent }) => {
     const [consentGiven, setConsentGiven] = useState(false);
@@ -16,20 +18,45 @@ const ConsentForm = ({ onConsent }) => {
 
     const handleEmailChange = (e) => {
         setEmail(e.target.value);
+    };    
+    
+    const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!consentGiven || !email) {
+        alert("Please provide consent and a valid email.");
+        return;
+    }
+
+    const payload = {
+        name: signature.trim(),  // optional
+        email: email.trim()
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (consentGiven && signature && email) {
-            onConsent(true);
-        } else {
-            alert("Please provide consent, signature, and email.");
-        }
-    };
+    try {
+        const response = await axios.post("http://localhost:5050/api/consent", payload);
 
-    // Check if all required fields are filled
-    const isFormValid = consentGiven && signature && email;
+        console.log("Consent stored:", response.data);
 
+        const { id } = response.data;
+
+        // Store in localStorage
+       // localStorage.setItem("userId", id);
+        Cookies.set('userId', id, { expires: 1/24 });  // expires in 1 hour
+
+        
+        alert("Consent submitted successfully.");
+        onConsent(true);
+    } catch (error) {
+        console.error("Submission error:", error);
+        alert("Failed to submit consent. Please check if the backend is running and CORS is allowed.");
+    }
+};
+
+const isFormValid = consentGiven && email;
+
+
+    
     return (
         <div className="form-container">
             <h2>Informed Consent for Participation in the Study</h2>
