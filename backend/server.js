@@ -1,35 +1,108 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-require('dotenv').config();
+const dotenv = require('dotenv');
+const bodyParser = require('body-parser');
 
+// Initialize dotenv and express app
+dotenv.config();
 const app = express();
-const PORT = process.env.PORT || 5050;
 
-// ✅ Fix CORS (MUST be before any routes)
-app.use(cors({
-  origin: 'http://localhost:3000',  // use 3000 or 3002 depending on frontend
-  methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type']
-}));
-
+// Use body-parser middleware to handle JSON requests
 app.use(express.json());
+app.use(cors());  // Enable CORS if frontend and backend are on different origins
 
-// ✅ MongoDB connection
+// MongoDB connection
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ MongoDB connected"))
-  .catch(err => console.error("❌ MongoDB connection error:", err));
+    .then(() => console.log("Connected to MongoDB Atlas"))
+    .catch((err) => console.error("Failed to connect to MongoDB Atlas:", err));
 
-// ✅ Simple root route
-app.get('/', (req, res) => {
-  res.send('Consent API is running');
+// MongoDB Schema for Consent Data
+const consentSchema = new mongoose.Schema({
+    id: { type: Number, required: true, unique: true },
+    name: { type: String, default: "" },
+    email: { type: String, required: true },
+    demographics: { type: Object, default: null } // Placeholder for demographics data
+}, { timestamps: true, collection: 'data' });
+
+const Consent = mongoose.model('Consent', consentSchema);
+
+// POST /api/consent - Store user consent data and return userId
+app.post('/api/consent', async (req, res) => {
+    const { name, email } = req.body;
+
+    if (!email) {
+        return res.status(400).json({ error: "Email is required." });
+    }
+
+    try {
+        // Get the last record to determine the next id
+        const lastRecord = await Consent.findOne().sort({ id: -1 }).exec();
+        const nextId = lastRecord ? lastRecord.id + 1 : 1;
+
+        const newConsent = new Consent({
+            id: nextId,
+            name: name || "",
+            email,
+            demographics: null // Initially set demographics to null
+        });
+
+        await newConsent.save();
+        res.status(201).json({ message: "Consent saved successfully", id: nextId }); // Send the generated userId
+
+    } catch (error) {
+        console.error("Error saving consent data:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
 });
 
-// ✅ Consent API routes
-const consentRoutes = require('./routes/consent');
-app.use('/api/consent', consentRoutes);
+// POST /api/demographics - Store demographics data linked by userId
+app.post('/api/demographics', async (req, res) => {
+    const { userId, gender, otherGender, education, otherEducation, aiExperience, otherAiExperience, computerProficiency, technologyAccess, location, occupation, otherOccupation, ethnicity, otherEthnicity, techUsageFrequency, ageGroup } = req.body;
 
-// ✅ Start the server
-app.listen(PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${PORT}`);
+    // Ensure userId is present
+    if (!userId) {
+        return res.status(400).json({ error: "UserId is required." });
+    }
+
+    try {
+        // Find the user by userId
+        const user = await Consent.findOne({ id: userId });
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found." });
+        }
+
+        // Update the demographics data for the user
+        user.demographics = {
+            gender,
+            otherGender,
+            education,
+            otherEducation,
+            aiExperience,
+            otherAiExperience,
+            computerProficiency,
+            technologyAccess,
+            location,
+            occupation,
+            otherOccupation,
+            ethnicity,
+            otherEthnicity,
+            techUsageFrequency,
+            ageGroup
+        };
+
+        await user.save(); // Save the updated user data
+
+        res.status(200).json({ message: "Demographics data saved successfully." });
+    } catch (error) {
+        console.error("Error saving demographics data:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
+// Start the server
+const port = process.env.PORT || 5050;
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
 });

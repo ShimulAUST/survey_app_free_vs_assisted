@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import AsyncSelect from "react-select/async"; // For searchable country select
 import axios from "axios";
+import Cookies from 'js-cookie'; // To access cookies
 
-const DemographicsForm = ({ onSubmit }) => {
+const DemographicsForm = () => {
     const [gender, setGender] = useState("");
     const [otherGender, setOtherGender] = useState("");
     const [education, setEducation] = useState("");
@@ -18,10 +19,20 @@ const DemographicsForm = ({ onSubmit }) => {
     const [otherEthnicity, setOtherEthnicity] = useState("");
     const [techUsageFrequency, setTechUsageFrequency] = useState("");
     const [ageGroup, setAgeGroup] = useState("");
+    const userId = Cookies.get('userId');
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        onSubmit({
+        
+        // Check if userId is present in cookies
+        if (!userId) {
+            alert("User ID not found. Please make sure you're properly logged in.");
+            return;
+        }
+
+        // Prepare the data to be sent to the backend
+        const formData = {
+            userId, // Include userId from cookies
             gender,
             otherGender,
             education,
@@ -36,8 +47,20 @@ const DemographicsForm = ({ onSubmit }) => {
             ethnicity,
             otherEthnicity,
             techUsageFrequency,
-            ageGroup
-        });
+            ageGroup,
+        };
+
+        // Send the data to the backend using axios
+        try {
+            const response = await axios.post("http://localhost:5050/api/demographics", formData);
+            console.log("Demographics data submitted successfully:", response.data);
+            alert("Demographics data submitted successfully.");
+            // Example redirect to another page
+             // Modify to your next page URL
+        } catch (error) {
+            console.error("Error submitting demographics data:", error);
+            alert("Failed to submit the demographics form. Please try again.");
+        }
     };
 
     // Function to fetch countries from RestCountries v3 API with fields parameter
