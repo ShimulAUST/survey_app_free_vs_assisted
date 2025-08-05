@@ -21,8 +21,8 @@ const App = () => {
     setStep(1);
   };
 
-  const handleDemographicsSubmit = (data) => {
-    setFormData({ ...formData, demographics: data });
+  const handleDemographicsSubmit = () => {
+    
     setStep(2);
   };
 

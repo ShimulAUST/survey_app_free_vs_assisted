@@ -3,7 +3,7 @@ import AsyncSelect from "react-select/async"; // For searchable country select
 import axios from "axios";
 import Cookies from 'js-cookie'; // To access cookies
 
-const DemographicsForm = () => {
+const DemographicsForm = ({onSubmit}) => {
     const [gender, setGender] = useState("");
     const [otherGender, setOtherGender] = useState("");
     const [education, setEducation] = useState("");
@@ -24,6 +24,7 @@ const DemographicsForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         
+        onSubmit({ ageGroup, gender });
         // Check if userId is present in cookies
         if (!userId) {
             alert("User ID not found. Please make sure you're properly logged in.");
@@ -56,6 +57,7 @@ const DemographicsForm = () => {
             console.log("Demographics data submitted successfully:", response.data);
             alert("Demographics data submitted successfully.");
             // Example redirect to another page
+
              // Modify to your next page URL
         } catch (error) {
             console.error("Error submitting demographics data:", error);
