@@ -321,7 +321,10 @@ const Survey = ({ onComplete }) => {
     );
     const userId = Cookies.get('userId');
     console.log("user id :",userId);
-    let participantId = (parseInt(userId) % 10);
+    
+    let participantId = (parseInt(userId-1) % 10);
+    
+    
     console.log("participant id below the participant ",participantId);
     const [currentScenario, setCurrentScenario] = useState(0);
     const [userQuestion, setUserQuestion] = useState("");
