@@ -157,7 +157,7 @@ const isFormValid = consentGiven && email;
             {/* Signature and Email grouped together */}
             <div>
                 <label>
-                    Signature (Full Name):
+                    Full Name:
                     <input
                         type="text"
                         value={signature}
@@ -170,14 +170,16 @@ const isFormValid = consentGiven && email;
 
                 <br />
 
-                <label>
+                <label >
                     Email:
                     <input
                         type="email"
                         value={email}
                         onChange={handleEmailChange}
                         placeholder="Enter your email"
+
                         required
+                         
                         style={{ width: "100%", padding: "8px", fontSize: "14px", borderRadius: "5px", border: "1px solid #ccc", marginTop: "5px" }}
                     />
                 </label>

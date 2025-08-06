@@ -1,5 +1,9 @@
+
+
 import React, { useState } from 'react';
 import '../css/feedback.css'; // Import the CSS file
+import axios from "axios";
+import Cookies from "js-cookie";
 
 const FeedbackForm = ({ onSubmit }) => {
     // Initial state for all questionnaire items
@@ -19,10 +23,16 @@ const FeedbackForm = ({ onSubmit }) => {
         aiHelpfulnessAssisted: '',
         assistingQuestionsRelevance: '',
         assistingQuestionsClarity: '',
+
+        //free prompting specific.
+        ideaExpression: '',
+        confidenceInQuestion:'',
+         alignmentWithResponse:'',
         // Comparative & Preference
         promptingPreference: '',
+        
         // Open-ended
-        openEndedSuggestions: '',
+        
         mostEnjoyableAspect: '',
         mostChallengingAspect: '',
     });
@@ -35,10 +45,24 @@ const FeedbackForm = ({ onSubmit }) => {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const saveFeedbackToBackend = async (data) => {
+    try {
+        const userId = Cookies.get("userId");
+        await axios.post("http://localhost:5050/api/save-final-feedback", {
+            userId,
+            feedback: data
+        });
+    } catch (err) {
+        console.error("Error saving feedback:", err);
+    }
+    };
+
+
+    const handleSubmit = async(e) => {
         e.preventDefault();
         // You might want to add some basic validation here
         // e.g., ensure all required fields are filled
+         await saveFeedbackToBackend(feedbackData);  //  Save to backend
         onSubmit(feedbackData);
     };
 
@@ -99,6 +123,29 @@ const FeedbackForm = ({ onSubmit }) => {
         { value: '4', label: '4 (Faster)' },
         { value: '5', label: '5 (Much Faster)' },
     ];
+    const freedomScaleOptions = [
+  { value: "1", label: "1 (Strongly Disagree)" },
+  { value: "2", label: "2 (Disagree)" },
+  { value: "3", label: "3 (Neutral)" },
+  { value: "4", label: "4 (Agree)" },
+  { value: "5", label: "5 (Strongly Agree)" },
+];
+
+const confidenceScaleOptions = [
+  { value: "1", label: "1 (Not Confident)" },
+  { value: "2", label: "2 (Slightly Confident)" },
+  { value: "3", label: "3 (Moderately Confident)" },
+  { value: "4", label: "4 (Confident)" },
+  { value: "5", label: "5 (Very Confident)" },
+];
+
+const alignmentScaleOptions = [
+  { value: "1", label: "1 (Strongly Disagree)" },
+  { value: "2", label: "2 (Disagree)" },
+  { value: "3", label: "3 (Neutral)" },
+  { value: "4", label: '4 (Agree)' },
+  { value: "5", label: '5 (Strongly Agree)' },
+];
 
     return (
         <div className="feedback-form-container">
@@ -146,7 +193,7 @@ const FeedbackForm = ({ onSubmit }) => {
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="interfaceIntuitiveness">4. The overall design and layout of the survey felt intuitive.</label>
+                    <label htmlFor="interfaceIntuitiveness">4. How mentally demanding was the task?</label>
                     <div className="likert-options">
                         {likertScaleOptions.map(option => (
                             <label key={option.value} className="likert-radio">
@@ -156,9 +203,9 @@ const FeedbackForm = ({ onSubmit }) => {
                         ))}
                     </div>
                 </div>
-
+                
                 <div className="form-group">
-                    <label htmlFor="timeEfficiency">5. Compared to how you might normally approach such tasks, did the AI interaction make the process faster or slower?</label>
+                    <label htmlFor="timeEfficiency">5. How hurried or rushed was the pace of the task?</label>
                     <div className="likert-options">
                         {efficiencyScaleOptions.map(option => (
                             <label key={option.value} className="likert-radio">
@@ -168,6 +215,7 @@ const FeedbackForm = ({ onSubmit }) => {
                         ))}
                     </div>
                 </div>
+                
 
                 {/* Section: AI Response Quality */}
                 <h3 className="form-section-heading">AI Response Quality (Across Both Prompting Types)</h3>
@@ -258,11 +306,73 @@ const FeedbackForm = ({ onSubmit }) => {
                         ))}
                     </div>
                 </div>
+                
+                <h3 className="form-section-heading">Free Prompting Specific Feedback</h3>
+<p className="form-section-description">
+    Please answer the following questions based on your experience with <strong>Free Prompting</strong> scenarios.
+</p>
+
+<div className="form-group">
+    <label htmlFor="ideaExpression">13. How freely were you able to express your own ideas and thoughts?</label>
+    <div className="likert-options">
+        {freedomScaleOptions.map(option => (
+            <label key={option.value} className="likert-radio">
+                <input
+                    type="radio"
+                    name="ideaExpression"
+                    value={option.value}
+                    checked={feedbackData.ideaExpression === option.value}
+                    onChange={handleChange}
+                    required
+                />
+                <span className="likert-label-text">{option.label}</span>
+            </label>
+        ))}
+    </div>
+</div>
+
+<div className="form-group">
+    <label htmlFor="confidenceInQuestion">14. How confident were you in forming your own question for the scenario?</label>
+    <div className="likert-options">
+        {confidenceScaleOptions.map(option => (
+            <label key={option.value} className="likert-radio">
+                <input
+                    type="radio"
+                    name="confidenceInQuestion"
+                    value={option.value}
+                    checked={feedbackData.confidenceInQuestion === option.value}
+                    onChange={handleChange}
+                    required
+                />
+                <span className="likert-label-text">{option.label}</span>
+            </label>
+        ))}
+    </div>
+</div>
+
+<div className="form-group">
+    <label htmlFor="alignmentWithResponse">15. The AI's response aligned well with my question and expectations.</label>
+    <div className="likert-options">
+        {alignmentScaleOptions.map(option => (
+            <label key={option.value} className="likert-radio">
+                <input
+                    type="radio"
+                    name="alignmentWithResponse"
+                    value={option.value}
+                    checked={feedbackData.alignmentWithResponse === option.value}
+                    onChange={handleChange}
+                    required
+                />
+                <span className="likert-label-text">{option.label}</span>
+            </label>
+        ))}
+    </div>
+</div>
 
                 {/* Section: Comparative & Preference */}
                 <h3 className="form-section-heading">Comparison & Preference</h3>
                 <div className="form-group">
-                    <label>13. Which prompting style did you prefer?</label>
+                    <label>16. Which prompting style did you prefer?</label>
                     <div className="radio-group">
                         <label className="radio-option">
                             <input type="radio" name="promptingPreference" value="Free" checked={feedbackData.promptingPreference === 'Free'} onChange={handleChange} required />
@@ -286,12 +396,12 @@ const FeedbackForm = ({ onSubmit }) => {
                 {/* Section: Open-ended Feedback */}
                 <h3 className="form-section-heading">Open-ended Comments</h3>
                 <div className="form-group">
-                    <label htmlFor="mostEnjoyableAspect">14. What did you find most enjoyable or effective about the survey experience?</label>
+                    <label htmlFor="mostEnjoyableAspect">17. What did you find most enjoyable or effective about the survey experience?</label>
                     <textarea id="mostEnjoyableAspect" name="mostEnjoyableAspect" value={feedbackData.mostEnjoyableAspect} onChange={handleChange} rows="4" className="textarea-input"></textarea>
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="mostChallengingAspect">15. What did you find most challenging or frustrating, or what could be improved?</label>
+                    <label htmlFor="mostChallengingAspect">18. What did you find most challenging or frustrating, or what could be improved?</label>
                     <textarea id="mostChallengingAspect" name="mostChallengingAspect" value={feedbackData.mostChallengingAspect} onChange={handleChange} rows="4" className="textarea-input"></textarea>
                 </div>
 
