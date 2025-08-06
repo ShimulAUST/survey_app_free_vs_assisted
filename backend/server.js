@@ -94,13 +94,14 @@ app.post('/api/save-scenario-result', async (req, res) => {
         userId,
         scenarioTitle,
         promptingType,
-        promptingQuality,
-        aiResponseQuality
+       evaluation,
     } = req.body;
 
     console.log(req.body);
 
-    if (!userId || !scenarioTitle || !promptingType || !promptingQuality || !aiResponseQuality) {
+    if (!userId || !scenarioTitle || !promptingType || !evaluation.clarity|| !evaluation.relevance ||
+        !evaluation.completeness || !evaluation.conciseness ||
+        !evaluation.factualAccuracy || !evaluation.contextualAccuracy || !evaluation.taskSuccess) { 
         return res.status(400).json({ error: "Missing required fields." });
     }
 
@@ -115,8 +116,14 @@ app.post('/api/save-scenario-result', async (req, res) => {
 
         // ✅ Set + Mark modified
         user.set(`scenarioInputs.${scenarioKey}`, {
-            promptingQuality,
-            aiResponseQuality
+                        clarity: evaluation.clarity,
+            relevance: evaluation.relevance,
+            completeness: evaluation.completeness,
+            conciseness: evaluation.conciseness,
+            factualAccuracy: evaluation.factualAccuracy,
+            contextualAccuracy: evaluation.contextualAccuracy,
+            taskSuccess: evaluation.taskSuccess
+
         });
         user.markModified('scenarioInputs');
 
