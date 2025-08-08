@@ -2,6 +2,45 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 
+const getAllApiKeys = () => [
+    process.env.REACT_APP_OPENAI_API_KEY,
+    process.env.REACT_APP_OPENAI_API_KEY2,
+    //   process.env.REACT_APP_OPENAI_API_KEY3,
+    //   process.env.REACT_APP_OPENAI_API_KEY4,
+    //   process.env.REACT_APP_OPENAI_API_KEY5,
+];
+
+
+// Try each key one by one until a response is returned
+const callOpenAiWithRotation = async (payload) => {
+    const apiKeys = getAllApiKeys();
+
+    for (let i = 0; i < apiKeys.length; i++) {
+        const apiKey = apiKeys[i];
+        if (!apiKey) continue;
+
+        try {
+            const response = await axios.post(
+                "https://api.openai.com/v1/chat/completions",
+                payload,
+                {
+                    headers: {
+                        Authorization: `Bearer ${apiKey}`,
+                    },
+                }
+            );
+            return response; // Success
+        } catch (error) {
+            console.warn(`API Key ${i + 1} failed:`, error?.response?.data?.error?.message || error.message);
+            if (i === apiKeys.length - 1) {
+                throw new Error("All OpenAI API keys failed.");
+            }
+        }
+    }
+};
+
+
+
 function balancedLatinSquare(array, participantId) {
     let result = [];
     for (let i = 0, j = 0, h = 0; i < array.length; ++i) {
@@ -95,7 +134,7 @@ const Survey = ({ onComplete }) => {
     const handleSubmitQuestion = async () => {
         setIsSubmittingQuestion(true);
         try {
-            const openAiApiKey = process.env.REACT_APP_OPENAI_API_KEY;
+
             const current = randomizedScenarios[currentScenario];
 
             const promptContent = current.promptingType === "Free"
@@ -133,17 +172,17 @@ User Question: ${userQuestion}
 
 
 
-            const openAiResponse = await axios.post(
-                "https://api.openai.com/v1/chat/completions",
+            const openAiResponse = await callOpenAiWithRotation(
+
                 {
                     model: "gpt-4o-mini",
                     messages: [
                         { role: "system", content: "Use <br> for paragraph breaks." },
                         { role: "user", content: promptContent },
                     ],
-                    max_tokens: 600,
+                    max_tokens: 1000,
                 },
-                { headers: { Authorization: `Bearer ${openAiApiKey}` } }
+                // { headers: { Authorization: `Bearer ${openAiApiKey}` } }
             );
 
             const responseText = openAiResponse.data.choices[0].message.content;
@@ -174,13 +213,13 @@ User Question: ${userQuestion}
     const handleSubmitFeedbackAndGetFinalResponse = async () => {
         setIsSubmittingFeedback(true);
         try {
-            const openAiApiKey = process.env.REACT_APP_OPENAI_API_KEY;
+
             const current = randomizedScenarios[currentScenario];
 
             const finalPrompt = `Given the user's feedback: "${feedback}", the original scenario: "${current.title} ${current.paragraph}", and the initial AI response: "${response}", please provide a final, detailed response that incorporates the feedback.`;
 
-            const finalOpenAiResponse = await axios.post(
-                "https://api.openai.com/v1/chat/completions",
+            const finalOpenAiResponse = await callOpenAiWithRotation(
+
                 {
                     model: "gpt-4o-mini",
                     messages: [
@@ -189,7 +228,7 @@ User Question: ${userQuestion}
                     ],
                     max_tokens: 1000,
                 },
-                { headers: { Authorization: `Bearer ${openAiApiKey}` } }
+                // { headers: { Authorization: `Bearer ${openAiApiKey}` } }
             );
 
             setFinalResponse(finalOpenAiResponse.data.choices[0].message.content);
