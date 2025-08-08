@@ -23,11 +23,11 @@ function balancedLatinSquare(array, participantId) {
 
 const Survey = ({ onComplete }) => {
     const scenarios = [
-         { title: "Scenario 1:", paragraph: "You need to create a marketing strategy for a new tech product targeted at university students. Consider the product's key features and define the target market. Think about advertising channels like social media, campus events, and digital ads. Focus on budget allocation and how you would measure campaign success." },
-         { title: "Scenario 2:", paragraph: "You need to invent a product that addresses a common problem people face in daily life. Describe the problem, the target audience, and the features of the product. Explain how it’s different from existing solutions and how it will be marketed and distributed." },
-        { title: "Scenario 3:", paragraph: "Write a persuasive essay on a social issue such as universal basic income (UBI). Present a clear argument, backed by reasoning and evidence, and discuss both the pros and cons." },
-        { title: "Scenario 4:", paragraph: "Design a fitness plan for someone with limited access to gym equipment, focusing on bodyweight exercises or resistance bands. The plan should include strength training, cardio, and flexibility." },
-        { title: "Scenario 5:", paragraph: "Design an online course curriculum for 'Introduction to Data Science,' covering topics like data analysis, statistics, and machine learning." },
+        { title: "Marketing Strategy Scenario:", paragraph: "You need to create a marketing strategy for a new tech product targeted at university students. Based on this scenario, write a clear and detailed prompt that you could give to an AI or assistant to help you design the marketing plan. Your prompt should include the product's key features, target market, possible advertising channels (like social media, campus events, and digital ads), budget considerations, and how to measure campaign success." },
+        { title: "Product Invention Scenario:", paragraph: "You need to invent a product that addresses a common problem people face in daily life. Based on this scenario, write a prompt that you could give to an AI or assistant to help you develop the idea. Your prompt should describe the problem, target audience, product features, how it’s different from existing solutions, and ideas for marketing and distribution." },
+        { title: "Eassay on Social Issue Scenario:", paragraph: "You need to write a persuasive essay on a social issue such as universal basic income (UBI). Based on this scenario, create a prompt you could give to an AI or assistant to help you draft the essay. Your prompt should specify the stance you want to take, the need for reasoning and evidence, and a balanced discussion of pros and cons." },
+        { title: "Problem Solving Scenario:", paragraph: "A cafe wants a program that can quickly calculate the total cost of a customer’s order, including tax. Based on this scenario, write a prompt that could be given to a coding assistant or AI tool to get help building the program." },
+        { title: "Mathmatical Scenario:", paragraph: "You need to design 2 real-life math problems involving percentages and discounts for a shopping context. Based on this scenario, write a prompt you could give to an AI or assistant to help generate these problems. Your prompt should mention the price ranges, percentage values, and whether solutions should be shown." },
     ];
 
     const conditions = ["Free", "Assisted"];
@@ -99,13 +99,39 @@ const Survey = ({ onComplete }) => {
             const current = randomizedScenarios[currentScenario];
 
             const promptContent = current.promptingType === "Free"
-                ? userQuestion
-                : `For the given scenario, provide a detailed and comprehensive response in one single paragraph.
+                ? `
+You are given a scenario and a user question. Based on that, provide a detailed and comprehensive response in valid HTML format only.
 
-After your main response, start a new paragraph and generate five distinct questions.These questions should encourage the user to elaborate, clarify, or think more deeply about their answer to the scenario. Format clearly using 'Question 1:', 'Question 2:', etc.
+- Format all paragraphs using <p> tags.
+- If the scenario involves math or code, use <pre><code>...</code></pre> blocks.
+- Provide a 1–2 line explanation in <p> tags after each code or equation.
+- Do NOT include any follow-up questions.
+
+Scenario Title: ${current.title}
+Scenario Context: ${current.paragraph}
+User Question: ${userQuestion}
+`
+                : `
+You are given a scenario and a user question. Based on that, provide a detailed and comprehensive response in valid HTML format.
+
+- Format all paragraphs using <p> tags.
+- If the scenario involves math or code, use <pre><code>...</code></pre> blocks.
+- Provide a 1–2 line explanation in <p> tags after each code or equation.
+- Return only valid HTML content for the main response.
+
+After your main HTML response, generate five follow-up questions to prompt deeper thinking.
+These questions must be returned as plain text only — do NOT include any HTML tags.
+Format them exactly like:
+Question 1: ...
+Question 2: ...
+...
+
+Scenario Title: ${current.title}
+Scenario Context: ${current.paragraph}
+User Question: ${userQuestion}
+`;
 
 
-Scenario: ${current.title} ${current.paragraph}`;
 
             const openAiResponse = await axios.post(
                 "https://api.openai.com/v1/chat/completions",
@@ -161,7 +187,7 @@ Scenario: ${current.title} ${current.paragraph}`;
                         { role: "system", content: "Use <br> for paragraph breaks." },
                         { role: "user", content: finalPrompt },
                     ],
-                    max_tokens: 600,
+                    max_tokens: 1000,
                 },
                 { headers: { Authorization: `Bearer ${openAiApiKey}` } }
             );
@@ -209,27 +235,35 @@ Scenario: ${current.title} ${current.paragraph}`;
 
     const renderLikertVertical = (key, label) => (
         <div style={{ marginTop: "20px", display: "flex", flexDirection: "column" }}>
-            <strong>{label}</strong>
-            {[1, 2, 3, 4, 5].map((num) => (
-                <label key={num} style={{ margin: "3px 0" }}>
-                    <input
-                        type="radio"
-                        name={key}
-                        value={num}
-                        checked={evaluationAnswers[key] === String(num)}
-                        onChange={(e) => handleEvaluationChange(key, e.target.value)}
-                    />{" "}
-                    {num} – {
-                        num === 1 ? "Strongly Disagree" :
-                        num === 2 ? "Disagree" :
-                        num === 3 ? "Neutral" :
-                        num === 4 ? "Agree" :
-                        "Strongly Agree"
-                    }
-                </label>
-            ))}
+            <strong style={{ marginBottom: "8px" }}>{label}</strong>
+
+            <div style={{ display: "flex", justifyContent: "space-between", gap: "16px" }}>
+                {[1, 2, 3, 4, 5].map((num) => (
+                    <label key={num} style={{ display: "flex", margin: "1px", backgroundColor: "yellow", flexDirection: "column", alignItems: "center", fontSize: "0.85rem" }}>
+                        <input
+                            type="radio"
+                            name={key}
+                            value={num}
+                            checked={evaluationAnswers[key] === String(num)}
+                            onChange={(e) => handleEvaluationChange(key, e.target.value)}
+
+
+                        />
+                        <span style={{ marginTop: "4px" }}>
+                            {
+                                num === 1 ? " 1 (Strongly Disagree)" :
+                                    num === 2 ? "2 (Disagree)" :
+                                        num === 3 ? "3 (Neutral)" :
+                                            num === 4 ? "4 (Agree)" :
+                                                "5 (Strongly Agree)"
+                            }
+                        </span>
+                    </label>
+                ))}
+            </div>
         </div>
     );
+
 
     return (
         <div className="survey-container">
@@ -255,9 +289,20 @@ Scenario: ${current.title} ${current.paragraph}`;
             </button>
 
             {response && (
-                <div>
+                <div >
                     <h4>AI Response:</h4>
-                    <p>{response.replace(/<br>/g, "\n")}</p>
+                    {/* <div dangerouslySetInnerHTML={{ __html: response }} style={{ backgroundColor: "#e3e3e3" }} /> */}
+                    <div
+                        dangerouslySetInnerHTML={{ __html: response }}
+                        style={{
+                            backgroundColor: "#e3e3e3",  // light gray background
+                            padding: "1rem",             // optional: adds spacing
+                            borderRadius: "8px",         // optional: rounded corners
+                            color: "#000",               // optional: ensures text is readable
+                        }}
+                    />
+
+                    {/* <p>{response.replace(/<br>/g, "\n")}</p> */}
                     {randomizedScenarios[currentScenario]?.promptingType === "Assisted" && (
                         <>
                             <h4>Assisting Questions:</h4>
@@ -282,7 +327,18 @@ Scenario: ${current.title} ${current.paragraph}`;
             {(randomizedScenarios[currentScenario]?.promptingType === "Assisted" || isFeedbackSubmitted) && finalResponse && (
                 <div>
                     <h4>Final Response:</h4>
-                    <p>{finalResponse.replace(/<br>/g, "\n")}</p>
+                    {/* <div dangerouslySetInnerHTML={{ __html: finalResponse }} style={{ backgroundColor: "#e3e3e3" }} /> */}
+                    <div
+                        dangerouslySetInnerHTML={{ __html: finalResponse }}
+                        style={{
+                            backgroundColor: "#e3e3e3",  // light gray background
+                            padding: "1rem",             // optional: adds spacing
+                            borderRadius: "8px",         // optional: rounded corners
+                            color: "#000",               // optional: ensures text is readable
+                        }}
+                    />
+
+                    {/* <p>{finalResponse.replace(/<br>/g, "\n")}</p> */}
                 </div>
             )}
             {isPromptingComplete && (

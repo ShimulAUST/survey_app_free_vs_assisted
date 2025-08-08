@@ -18,27 +18,27 @@ const Instructions = ({ onNext }) => {
                 This survey is designed to compare <b>Free Prompting</b> and <b>Assisted Prompting</b>.
                 You will be asked to answer a series of questions in two different ways:
                 <ol>
-                    <li><strong>Free Prompting:</strong> You will answer questions without any assistance.</li>
-                    <li><strong>Assisted Prompting:</strong> You will answer the same questions, but with suggestions or guidance to help you answer.</li>
+                    <li><strong>Free Prompting:</strong> You will give prompt for the task without any assistance.</li>
+                    <li><strong>Assisted Prompting:</strong> You will give the prompt for the  same task, but with suggestions or guidance to help you to get the better result.</li>
                 </ol>
             </p>
 
             <p style={{ textAlign: "left", fontSize: "16px" }}>
                 <strong>Counterbalancing and Randomization:</strong><br />
-                - The order of the two prompting methods (Free vs. Assisted) will be <b>randomly assigned</b> to you. You might either start with Free Prompting or Assisted Prompting.<br />
-                - Each of the two prompting methods will have the same set of scenarios, but they will be presented in a <b>randomized order</b> within each prompting section.
+                - The order of the two prompting methods (Free vs. Assisted) will be <b>randomly assigned</b> to you .<br />
+                - Each of the two prompting methods will have the same set of scenarios, but they will be presented in a <b>randomized order</b>.
             </p>
 
             <p style={{ textAlign: "left", fontSize: "16px" }}>
                 <strong>What You Will Do:</strong><br />
-                - First, you will complete the <b>Free Prompting Task</b> or <b>Assisted Prompting Task</b>, based on the random assignment.<br />
-                - After completing one prompting method, you will proceed to the other prompting method and perform the same tasks, but this time with randomized scenarios.<br />
-                - Each prompting section will take approximately <b>10-15 minutes</b>.
+                - The survey uses randomized scenarios.<br />
+
+                - After each scenario, the participants must answer some follow-up questions and submit them before proceeding.
             </p>
 
             <p style={{ textAlign: "left", fontSize: "16px" }}>
                 <strong>Post-Survey Feedback:</strong><br />
-                After completing both sections, you will be asked to provide feedback on your experience, including:
+                After completing survey, you will be asked to provide feedback on your experience, including:
                 <br /> - Which prompting method you found easier to use.
                 <br />  - How helpful the suggestions in Assisted Prompting were.
                 <br /> - Any additional thoughts or comments you may have.
@@ -46,7 +46,7 @@ const Instructions = ({ onNext }) => {
 
             <p style={{ textAlign: "left", fontSize: "16px" }}>
                 <strong>Time Commitment:</strong><br />
-                The total time for the survey is approximately <b>30-40 minutes</b>. Please take your time to answer each section thoughtfully.
+                The total time for the survey is approximately <b>50-60 minutes</b>. Please take your time to answer each section thoughtfully.
             </p>
 
             <div style={{ textAlign: "center" }}>
